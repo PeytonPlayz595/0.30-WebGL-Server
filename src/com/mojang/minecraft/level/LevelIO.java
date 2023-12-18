@@ -63,7 +63,7 @@ public final class LevelIO {
          }
       } catch (Exception var9) {
          var9.printStackTrace();
-         "Failed to load level: " + var9.toString();
+         System.err.println("Failed to load level: " + var9.toString());
          return null;
       }
    }

@@ -3,6 +3,7 @@ package com.mojang.net;
 import com.mojang.minecraft.net.PacketType;
 import com.mojang.minecraft.server.NetworkManager;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
@@ -21,19 +22,23 @@ public final class NetworkHandler {
 
 
    public NetworkHandler(SocketChannel var1) {
-      this.channel = var1;
-      this.channel.configureBlocking(false);
-      System.currentTimeMillis();
-      this.socket = this.channel.socket();
-      this.connected = true;
-      this.in.clear();
-      this.out.clear();
-      this.socket.setTcpNoDelay(true);
-      this.socket.setTrafficClass(24);
-      this.socket.setKeepAlive(false);
-      this.socket.setReuseAddress(false);
-      this.socket.setSoTimeout(100);
-      this.address = this.socket.getInetAddress().toString();
+	  try {
+		  this.channel = var1;
+		  this.channel.configureBlocking(false);
+		  System.currentTimeMillis();
+		  this.socket = this.channel.socket();
+		  this.connected = true;
+		  this.in.clear();
+		  this.out.clear();
+		  this.socket.setTcpNoDelay(true);
+		  this.socket.setTrafficClass(24);
+		  this.socket.setKeepAlive(false);
+		  this.socket.setReuseAddress(false);
+		  this.socket.setSoTimeout(100);
+		  this.address = this.socket.getInetAddress().toString();
+	  } catch(Exception e) {
+		  e.printStackTrace();
+	  }
    }
 
    public final void close() {

@@ -40,9 +40,9 @@ public final class i extends r {
       }
 
       if(var5 != 0) {
-         LiquidType var7 = a.b[var5].d();
+         LiquidType var7 = b[var5].d();
          if(this.ad == LiquidType.WATER && var7 == LiquidType.LAVA || var7 == LiquidType.WATER && this.ad == LiquidType.LAVA) {
-            var1.setTile(var2, var3, var4, a.e.ab);
+            var1.setTile(var2, var3, var4, e.ab);
             return;
          }
       }

@@ -27,9 +27,9 @@ public final class f extends a {
          int var8 = var5 - 1;
          int var10;
          LiquidType var12;
-         if(!((var10 = var1.getTile(var11, var8, var6)) == 0?true:((var12 = a.b[var10].d()) == LiquidType.WATER?true:var12 == LiquidType.LAVA)) || var5 <= 0) {
+         if(!((var10 = var1.getTile(var11, var8, var6)) == 0?true:((var12 = b[var10].d()) == LiquidType.WATER?true:var12 == LiquidType.LAVA)) || var5 <= 0) {
             if(var5 != var3) {
-               if((var10 = var1.getTile(var11, var5, var6)) > 0 && a.b[var10].d() != LiquidType.NOT_LIQUID) {
+               if((var10 = var1.getTile(var11, var5, var6)) > 0 && b[var10].d() != LiquidType.NOT_LIQUID) {
                   var1.setTileNoUpdate(var11, var5, var6, 0);
                }
 

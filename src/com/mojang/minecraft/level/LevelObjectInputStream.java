@@ -1,5 +1,6 @@
 package com.mojang.minecraft.level;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
@@ -8,10 +9,10 @@ import java.util.Set;
 
 public final class LevelObjectInputStream extends ObjectInputStream {
 
-   private Set classes = new HashSet();
+   private Set classes = new HashSet<String>();
 
 
-   public LevelObjectInputStream(InputStream var1) {
+   public LevelObjectInputStream(InputStream var1) throws IOException {
       super(var1);
       this.classes.add("com.mojang.minecraft.player.Player$1");
       this.classes.add("com.mojang.minecraft.mob.Creeper$1");
@@ -19,7 +20,13 @@ public final class LevelObjectInputStream extends ObjectInputStream {
    }
 
    protected final ObjectStreamClass readClassDescriptor() {
-      ObjectStreamClass var1 = super.readClassDescriptor();
-      return this.classes.contains(var1.getName())?ObjectStreamClass.lookup(Class.forName(var1.getName())):var1;
+	  try {
+		  ObjectStreamClass var1 = super.readClassDescriptor();
+      	return this.classes.contains(var1.getName())?ObjectStreamClass.lookup(Class.forName(var1.getName())):var1;
+	  } catch(Exception e) {
+		  e.printStackTrace();
+		  System.err.println("Error reading class descriptor!");
+		  return null;
+	  }
    }
 }

@@ -14,9 +14,9 @@ final class LevelSaver extends Thread {
 
 
    LevelSaver(NetworkManager var1, byte[] var2) {
+	  super();
       this.networkManager = var1;
       this.bytes = var2;
-      super();
    }
 
    public final void run() {

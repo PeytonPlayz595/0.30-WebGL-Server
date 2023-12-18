@@ -15,8 +15,12 @@ public final class BindTo {
 
    public BindTo(int var1, MinecraftServer var2) {
       this.server = var2;
-      this.serverChannel = ServerSocketChannel.open();
-      this.serverChannel.socket().bind(new InetSocketAddress(var1));
-      this.serverChannel.configureBlocking(false);
+      try {
+    	  this.serverChannel = ServerSocketChannel.open();
+    	  this.serverChannel.socket().bind(new InetSocketAddress(var1));
+    	  this.serverChannel.configureBlocking(false);
+      } catch(Exception e) {
+    	  e.printStackTrace();
+      }
    }
 }

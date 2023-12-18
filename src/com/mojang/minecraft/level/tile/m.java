@@ -16,7 +16,7 @@ public class m extends a {
 
    public void a(Level var1, int var2, int var3, int var4, Random var5) {
       int var6 = var1.getTile(var2, var3 - 1, var4);
-      if(!var1.isLit(var2, var3, var4) || var6 != a.g.ab && var6 != a.f.ab) {
+      if(!var1.isLit(var2, var3, var4) || var6 != g.ab && var6 != f.ab) {
          var1.setTile(var2, var3, var4, 0);
       }
 

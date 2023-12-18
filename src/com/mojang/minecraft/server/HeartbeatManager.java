@@ -18,9 +18,9 @@ final class HeartbeatManager extends Thread {
 
 
    HeartbeatManager(MinecraftServer var1, String var2) {
+	  super();
       this.server = var1;
       this.name = var2;
-      super();
    }
 
    public final void run() {

@@ -22,19 +22,19 @@ public final class k extends a {
    }
 
    public final void a(Level var1, int var2, int var3, int var4, int var5) {
-      if(this == a.V) {
+      if(this == V) {
          ;
       }
    }
 
    public final void b(Level var1, int var2, int var3, int var4) {
-      if(this != a.V) {
+      if(this != V) {
          super.b(var1, var2, var3, var4);
       }
 
       if(var1.getTile(var2, var3 - 1, var4) == V.ab) {
          var1.setTile(var2, var3, var4, 0);
-         var1.setTile(var2, var3 - 1, var4, a.U.ab);
+         var1.setTile(var2, var3 - 1, var4, U.ab);
       }
 
    }

@@ -12,8 +12,8 @@ final class ConsoleInput extends Thread {
 
 
    ConsoleInput(MinecraftServer var1) {
+	  super();
       this.server = var1;
-      super();
    }
 
    public final void run() {

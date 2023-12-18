@@ -86,7 +86,7 @@ public class a {
    public static final a aa;
    public final int ab;
    public Tile$SoundType ac;
-   private boolean ag;
+   protected boolean ag;
    private float ah;
    private float ai;
    private float aj;
