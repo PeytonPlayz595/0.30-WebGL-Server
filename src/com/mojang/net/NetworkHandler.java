@@ -2,50 +2,40 @@ package com.mojang.net;
 
 import com.mojang.minecraft.net.PacketType;
 import com.mojang.minecraft.server.NetworkManager;
-import java.net.Socket;
-import java.net.SocketException;
+
+import net.io.DummyLogger;
+import net.io.WebSocketNetworkManager;
+
 import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
 import java.util.Arrays;
+
+import org.eclipse.jetty.util.log.Log;
 
 public final class NetworkHandler {
 
    public volatile boolean connected;
-   public SocketChannel channel;
    public ByteBuffer in = ByteBuffer.allocate(1048576);
    public ByteBuffer out = ByteBuffer.allocate(1048576);
    public NetworkManager networkManager;
-   private Socket socket;
    private boolean h = false;
    public String address;
    private byte[] stringBytes = new byte[64];
 
 
-   public NetworkHandler(SocketChannel var1) {
-	  try {
-		  this.channel = var1;
-		  this.channel.configureBlocking(false);
-		  System.currentTimeMillis();
-		  this.socket = this.channel.socket();
-		  this.connected = true;
-		  this.in.clear();
-		  this.out.clear();
-		  this.socket.setTcpNoDelay(true);
-		  this.socket.setTrafficClass(24);
-		  this.socket.setKeepAlive(false);
-		  this.socket.setReuseAddress(false);
-		  this.socket.setSoTimeout(100);
-		  this.address = this.socket.getInetAddress().toString();
-	  } catch(Exception e) {
-		  e.printStackTrace();
-	  }
+   public NetworkHandler(int port) {
+	   Log.setLog(new DummyLogger());
+	   try {
+		WebSocketNetworkManager.startServer(port);
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
    }
 
    public final void close() {
       try {
          if(this.out.position() > 0) {
             this.out.flip();
-            this.channel.write(this.out);
+            this.write(this.out);
             this.out.compact();
          }
       } catch (Exception var2) {
@@ -55,13 +45,10 @@ public final class NetworkHandler {
       this.connected = false;
 
       try {
-         this.channel.close();
+    	  WebSocketNetworkManager.stopServer();
       } catch (Exception var1) {
          ;
       }
-
-      this.socket = null;
-      this.channel = null;
    }
 
    public final void send(PacketType var1, Object ... var2) {
@@ -154,5 +141,13 @@ public final class NetworkHandler {
             return null;
          }
       }
+   }
+   
+   public void read(ByteBuffer buf) {
+	   WebSocketNetworkManager.read(buf);
+   }
+   
+   public void write(ByteBuffer buf) {
+	   WebSocketNetworkManager.write(buf);
    }
 }

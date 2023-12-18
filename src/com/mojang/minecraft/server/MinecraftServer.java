@@ -20,7 +20,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.nio.channels.SocketChannel;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -286,14 +285,10 @@ public class MinecraftServer implements Runnable {
          try {
             NetworkHandler var3 = var10.networkHandler;
 
-            try {
-               if(var3.out.position() > 0) {
-                  var3.out.flip();
-                  var3.channel.write(var3.out);
-                  var3.out.compact();
-               }
-            } catch (IOException var6) {
-               ;
+            if(var3.out.position() > 0) {
+               var3.out.flip();
+               var3.write(var3.out);
+               var3.out.compact();
             }
 
             if(var10.b-- <= 0) {
@@ -332,120 +327,68 @@ public class MinecraftServer implements Runnable {
          }
       }
 
-      try {
-         BindTo var13 = this.bindTo;
+      BindTo var13 = this.bindTo;
+      NetworkHandler var2 = new NetworkHandler(8080);
+      var13.c.add(var2);
 
-         SocketChannel var14;
-         while((var14 = var13.serverChannel.accept()) != null) {
-            try {
-               var14.configureBlocking(false);
-               NetworkHandler var2 = new NetworkHandler(var14);
-               var13.c.add(var2);
-               NetworkHandler var3 = var2;
-               MinecraftServer var4 = var13.server;
-               if(var13.server.playerManager3.containsPlayer(var2.address)) {
-                  var2.send(PacketType.DISCONNECT, new Object[]{"You\'re banned!"});
-                  logger.info(var2.address + " tried to connect, but is banned.");
-                  var4.b(var2);
-               } else {
-                  int var5 = 0;
-                  Iterator var6 = var4.n.iterator();
+      for(int var17 = 0; var17 < var13.c.size(); ++var17) {
+         NetworkHandler var15 = (NetworkHandler)var13.c.get(var17);
 
-                  while(var6.hasNext()) {
-                     if(((NetworkManager)var6.next()).networkHandler.address.equals(var3.address)) {
-                        ++var5;
-                     }
-                  }
+         try {
+            NetworkHandler var20 = var15;
+            var15.read(var15.in);
+            int var19 = 0;
 
-                  if(var5 >= var4.maxConnections) {
-                     var3.send(PacketType.DISCONNECT, new Object[]{"Too many connection!"});
-                     logger.info(var3.address + " tried to connect, but is already connected " + var5 + " times.");
-                     var4.b(var3);
-                  } else {
-                     int var24;
-                     if((var24 = var4.e()) < 0) {
-                        var3.send(PacketType.DISCONNECT, new Object[]{"The server is full!"});
-                        logger.info(var3.address + " tried to connect, but failed because the server was full.");
-                        var4.b(var3);
-                     } else {
-                        NetworkManager var16 = new NetworkManager(var4, var3, var24);
-                        logger.info(var16 + " connected");
-                        var4.m.put(var3, var16);
-                        var4.n.add(var16);
-                        if(var16.playerID >= 0) {
-                           var4.networkManager[var16.playerID] = var16;
-                        }
-                     }
-                  }
+            while(var20.in.position() > 0 && var19++ != 100) {
+               var20.in.flip();
+               byte var22 = var20.in.get(0);
+               PacketType var25;
+               if((var25 = PacketType.packets[var22]) == null) {
+                  throw new IOException("Bad command: " + var22);
                }
-            } catch (IOException var10) {
-               var14.close();
-               throw var10;
-            }
-         }
 
-         for(int var17 = 0; var17 < var13.c.size(); ++var17) {
-            NetworkHandler var15 = (NetworkHandler)var13.c.get(var17);
-
-            try {
-               NetworkHandler var20 = var15;
-               var15.channel.read(var15.in);
-               int var19 = 0;
-
-               while(var20.in.position() > 0 && var19++ != 100) {
-                  var20.in.flip();
-                  byte var22 = var20.in.get(0);
-                  PacketType var25;
-                  if((var25 = PacketType.packets[var22]) == null) {
-                     throw new IOException("Bad command: " + var22);
-                  }
-
-                  if(var20.in.remaining() < var25.length + 1) {
-                     var20.in.compact();
-                     break;
-                  }
-
-                  var20.in.get();
-                  Object[] var21 = new Object[var25.params.length];
-
-                  for(int var7 = 0; var7 < var21.length; ++var7) {
-                     var21[var7] = var20.receive(var25.params[var7]);
-                  }
-
-                  var20.networkManager.a(var25, var21);
-                  if(!var20.connected) {
-                     break;
-                  }
-
+               if(var20.in.remaining() < var25.length + 1) {
                   var20.in.compact();
+                  break;
                }
 
-               if(var20.out.position() > 0) {
-                  var20.out.flip();
-                  var20.channel.write(var20.out);
-                  var20.out.compact();
+               var20.in.get();
+               Object[] var21 = new Object[var25.params.length];
+
+               for(int var7 = 0; var7 < var21.length; ++var7) {
+                  var21[var7] = var20.receive(var25.params[var7]);
                }
-            } catch (Exception var9) {
-               MinecraftServer var10001 = var13.server;
-               NetworkManager var23;
-               if((var23 = (NetworkManager)var13.server.m.get(var15)) != null) {
-                  var23.a(var9);
+
+               var20.networkManager.a(var25, var21);
+               if(!var20.connected) {
+                  break;
                }
+
+               var20.in.compact();
             }
 
-            try {
-               if(!var15.connected) {
-                  var15.close();
-                  var13.server.a(var15);
-                  var13.c.remove(var17--);
-               }
-            } catch (Exception var8) {
-               var8.printStackTrace();
+            if(var20.out.position() > 0) {
+               var20.out.flip();
+               var20.write(var20.out);
+               var20.out.compact();
+            }
+         } catch (Exception var9) {
+            MinecraftServer var10001 = var13.server;
+            NetworkManager var23;
+            if((var23 = (NetworkManager)var13.server.m.get(var15)) != null) {
+               var23.a(var9);
             }
          }
 
-      } catch (IOException var11) {
-         throw new RuntimeException("IOException while ticking socketserver", var11);
+         try {
+            if(!var15.connected) {
+               var15.close();
+               var13.server.a(var15);
+               var13.c.remove(var17--);
+            }
+         } catch (Exception var8) {
+            var8.printStackTrace();
+         }
       }
    }
 
