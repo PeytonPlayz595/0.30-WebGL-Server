@@ -31,8 +31,8 @@ public class WebSocketNetworkManager extends WebSocketServlet {
     }
     
     @OnWebSocketMessage
-    public void onMessage(byte[] data, int offset, int length) {
-        ByteBuffer buffer = ByteBuffer.wrap(data, offset, length);
+    public void onMessage(Session session, byte[] data, int offset, int length) {
+        ByteBuffer buffer = ByteBuffer.wrap(data);
         receivedBuffers.add(buffer);
     }
 
