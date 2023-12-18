@@ -20,15 +20,18 @@ public final class NetworkHandler {
    private boolean h = false;
    public String address;
    private byte[] stringBytes = new byte[64];
+   public static boolean gay = false;
 
 
    public NetworkHandler(int port) {
+	   gay = true;
 	   Log.setLog(new DummyLogger());
 	   try {
-		WebSocketNetworkManager.startServer(port);
-	} catch (Exception e) {
-		e.printStackTrace();
-	}
+		   WebSocketNetworkManager.startServer(port);
+	   } catch (Exception e) {
+		   e.printStackTrace();
+		   throw new Error(e.getLocalizedMessage());
+	   }
    }
 
    public final void close() {

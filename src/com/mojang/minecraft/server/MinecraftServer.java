@@ -324,8 +324,10 @@ public class MinecraftServer implements Runnable {
       }
 
       BindTo var13 = this.bindTo;
-      NetworkHandler var2 = new NetworkHandler(8080);
-      var13.c.add(var2);
+      if(!NetworkHandler.gay) {
+    	  NetworkHandler var2 = new NetworkHandler(25565);
+    	  var13.c.add(var2);
+      }
 
       for(int var17 = 0; var17 < var13.c.size(); ++var17) {
          NetworkHandler var15 = (NetworkHandler)var13.c.get(var17);
