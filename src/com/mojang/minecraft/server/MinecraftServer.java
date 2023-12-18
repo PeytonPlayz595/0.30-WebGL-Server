@@ -48,7 +48,6 @@ public class MinecraftServer implements Runnable {
    private boolean public_ = false;
    public String serverName;
    public String MOTD;
-   private int port;
    public boolean adminSlot;
    private NetworkManager[] networkManager;
    public PlayerManager playerManager1 = new PlayerManager("Admins", new File("admins.txt"));
@@ -78,7 +77,6 @@ public class MinecraftServer implements Runnable {
       try {
          this.serverName = this.properties.getProperty("server-name", "Minecraft Server");
          this.MOTD = this.properties.getProperty("motd", "Welcome to my Minecraft Server!");
-         this.port = Integer.parseInt(this.properties.getProperty("port", "25565"));
          this.maxPlayers = Integer.parseInt(this.properties.getProperty("max-players", "16"));
          this.public_ = Boolean.parseBoolean(this.properties.getProperty("public", "true"));
          this.verifyNames = Boolean.parseBoolean(this.properties.getProperty("verify-names", "true"));
@@ -96,7 +94,6 @@ public class MinecraftServer implements Runnable {
          this.properties.setProperty("server-name", this.serverName);
          this.properties.setProperty("motd", this.MOTD);
          this.properties.setProperty("max-players", "" + this.maxPlayers);
-         this.properties.setProperty("port", "" + this.port);
          this.properties.setProperty("public", "" + this.public_);
          this.properties.setProperty("verify-names", "" + this.verifyNames);
          this.properties.setProperty("max-connections", "3");
@@ -131,7 +128,7 @@ public class MinecraftServer implements Runnable {
       }
 
       this.networkManager = new NetworkManager[this.maxPlayers];
-      this.bindTo = new BindTo(this.port, this);
+      this.bindTo = new BindTo(this);
       (new ConsoleInput(this)).start();
    }
 
@@ -188,7 +185,7 @@ public class MinecraftServer implements Runnable {
    }
 
    public void run() {
-      logger.info("Now accepting input on " + this.port);
+      logger.info("Now accepting input on 8080");
       int var1 = 50000000;
       int var2 = 500000000;
 
@@ -222,7 +219,6 @@ public class MinecraftServer implements Runnable {
                   var9.put("users", Integer.valueOf(this.n.size()));
                   var9.put("max", Integer.valueOf(this.maxPlayers - (this.adminSlot?1:0)));
                   var9.put("public", Boolean.valueOf(this.public_));
-                  var9.put("port", Integer.valueOf(this.port));
                   var9.put("salt", this.salt);
                   var9.put("admin-slot", Boolean.valueOf(this.adminSlot));
                   var9.put("version", Byte.valueOf((byte)7));
