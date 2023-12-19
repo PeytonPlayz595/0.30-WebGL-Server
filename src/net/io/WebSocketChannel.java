@@ -69,7 +69,6 @@ public class WebSocketChannel {
 
         server.setHandler(context);
         server.start();
-        server.join();
     }
 
     public void stopServer() {
@@ -112,11 +111,7 @@ public class WebSocketChannel {
                 if (sessionBytesToWrite > 0) {
                     byte[] data = new byte[sessionBytesToWrite];
                     buffer.get(data);
-                    try {
-						session.getRemote().sendBytes(ByteBuffer.wrap(data));
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+                    session.getRemote().sendBytesByFuture(ByteBuffer.wrap(data));
                 }
                 bytesToWrite += sessionBytesToWrite;
             }

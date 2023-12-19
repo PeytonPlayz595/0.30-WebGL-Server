@@ -139,7 +139,7 @@ public class MinecraftServer implements Runnable {
    }
 
    public void run() {
-      logger.info("Now accepting input on 8080");
+      logger.info("Now accepting input on 25565");
       int var1 = 50000000;
       int var2 = 500000000;
 
