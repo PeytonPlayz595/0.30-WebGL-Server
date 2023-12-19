@@ -4,7 +4,7 @@ import com.mojang.minecraft.net.PacketType;
 import com.mojang.minecraft.server.NetworkManager;
 
 import net.io.DummyLogger;
-import net.io.WebSocketNetworkManager;
+import net.io.WebSocketChannel;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -21,13 +21,13 @@ public final class NetworkHandler {
    public String address;
    private byte[] stringBytes = new byte[64];
    public static boolean gay = false;
-
+   public WebSocketChannel channel;
 
    public NetworkHandler(int port) {
 	   gay = true;
-	   Log.setLog(new DummyLogger());
 	   try {
-		   WebSocketNetworkManager.startServer(port);
+		   Log.setLog(new DummyLogger());
+		   channel = new WebSocketChannel(port);
 	   } catch (Exception e) {
 		   e.printStackTrace();
 		   throw new Error(e.getLocalizedMessage());
@@ -38,7 +38,7 @@ public final class NetworkHandler {
       try {
          if(this.out.position() > 0) {
             this.out.flip();
-            this.write(this.out);
+            this.channel.write(this.out);
             this.out.compact();
          }
       } catch (Exception var2) {
@@ -48,7 +48,7 @@ public final class NetworkHandler {
       this.connected = false;
 
       try {
-    	  WebSocketNetworkManager.stopServer();
+    	  channel.stopServer();
       } catch (Exception var1) {
          ;
       }
@@ -144,13 +144,5 @@ public final class NetworkHandler {
             return null;
          }
       }
-   }
-   
-   public void read(ByteBuffer buf) {
-	   WebSocketNetworkManager.read(buf);
-   }
-   
-   public void write(ByteBuffer buf) {
-	   WebSocketNetworkManager.write(buf);
    }
 }

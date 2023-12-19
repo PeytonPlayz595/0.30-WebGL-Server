@@ -236,7 +236,7 @@ public class MinecraftServer implements Runnable {
 
             if(var3.out.position() > 0) {
                var3.out.flip();
-               var3.write(var3.out);
+               var3.channel.write(var3.out);
                var3.out.compact();
             }
 
@@ -287,7 +287,7 @@ public class MinecraftServer implements Runnable {
 
          try {
             NetworkHandler var20 = var15;
-            var15.read(var15.in);
+            var15.channel.read(var15.in);
             int var19 = 0;
 
             while(var20.in.position() > 0 && var19++ != 100) {
@@ -320,7 +320,7 @@ public class MinecraftServer implements Runnable {
 
             if(var20.out.position() > 0) {
                var20.out.flip();
-               var20.write(var20.out);
+               var20.channel.write(var20.out);
                var20.out.compact();
             }
          } catch (Exception var9) {
