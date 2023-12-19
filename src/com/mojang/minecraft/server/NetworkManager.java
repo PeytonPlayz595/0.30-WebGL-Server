@@ -4,8 +4,6 @@ import com.mojang.minecraft.AvailableBlockType;
 import com.mojang.minecraft.level.Level;
 import com.mojang.minecraft.level.tile.a;
 import com.mojang.minecraft.net.PacketType;
-import com.mojang.minecraft.server.LevelSaver;
-import com.mojang.minecraft.server.MinecraftServer;
 import com.mojang.net.NetworkHandler;
 import com.mojang.util.MathHelper;
 import java.io.IOException;
@@ -105,9 +103,7 @@ public final class NetworkManager {
                this.a("Illegal name.");
             }
 
-            if(this.server.verifyNames && !var8.equals(this.server.saltGenerator.generate(var3))) {
-               this.a("The name wasn\'t verified by minecraft.net!");
-            } else if(var6 != 7) {
+            if(var6 != 7) {
                this.a("Wrong protocol version.");
             } else if(this.server.playerManager2.containsPlayer(var3)) {
                this.a("You\'re banned!");

@@ -3,14 +3,6 @@ package com.mojang.minecraft.server;
 import com.mojang.minecraft.level.LevelIO;
 import com.mojang.minecraft.level.generator.LevelGenerator;
 import com.mojang.minecraft.net.PacketType;
-import com.mojang.minecraft.server.ConsoleInput;
-import com.mojang.minecraft.server.HeartbeatManager;
-import com.mojang.minecraft.server.LogFormatter;
-import com.mojang.minecraft.server.LogHandler;
-import com.mojang.minecraft.server.NetworkManager;
-import com.mojang.minecraft.server.PlayerManager;
-import com.mojang.minecraft.server.SaltGenerator;
-import com.mojang.minecraft.server.UNKNOWN0;
 import com.mojang.net.BindTo;
 import com.mojang.net.NetworkHandler;
 import java.io.File;
@@ -42,10 +34,8 @@ public class MinecraftServer implements Runnable {
    private Map m = new HashMap();
    private List n = new ArrayList();
    private List o = new ArrayList();
-   private int maxPlayers;
    private Properties properties = new Properties();
    public com.mojang.minecraft.level.Level mainLevel;
-   private boolean public_ = false;
    public String serverName;
    public String MOTD;
    public boolean adminSlot;
@@ -57,15 +47,9 @@ public class MinecraftServer implements Runnable {
    private List v = new ArrayList();
    private String salt = "" + (new Random()).nextLong();
    private String x = "";
-   public SaltGenerator saltGenerator;
-   public boolean verifyNames;
    private boolean growTrees;
-   private int maxConnections;
-
 
    public MinecraftServer() {
-      this.saltGenerator = new SaltGenerator(this.salt);
-      this.verifyNames = false;
       this.growTrees = false;
 
       try {
@@ -77,25 +61,11 @@ public class MinecraftServer implements Runnable {
       try {
          this.serverName = this.properties.getProperty("server-name", "Minecraft Server");
          this.MOTD = this.properties.getProperty("motd", "Welcome to my Minecraft Server!");
-         this.maxPlayers = Integer.parseInt(this.properties.getProperty("max-players", "16"));
-         this.public_ = Boolean.parseBoolean(this.properties.getProperty("public", "true"));
-         this.verifyNames = Boolean.parseBoolean(this.properties.getProperty("verify-names", "true"));
          this.growTrees = Boolean.parseBoolean(this.properties.getProperty("grow-trees", "false"));
          this.adminSlot = Boolean.parseBoolean(this.properties.getProperty("admin-slot", "false"));
-         if(this.maxPlayers < 1) {
-            this.maxPlayers = 1;
-         }
 
-         if(this.maxPlayers > 32) {
-            this.maxPlayers = 32;
-         }
-
-         this.maxConnections = Integer.parseInt(this.properties.getProperty("max-connections", "3"));
          this.properties.setProperty("server-name", this.serverName);
          this.properties.setProperty("motd", this.MOTD);
-         this.properties.setProperty("max-players", "" + this.maxPlayers);
-         this.properties.setProperty("public", "" + this.public_);
-         this.properties.setProperty("verify-names", "" + this.verifyNames);
          this.properties.setProperty("max-connections", "3");
          this.properties.setProperty("grow-trees", "" + this.growTrees);
          this.properties.setProperty("admin-slot", "" + this.adminSlot);
@@ -105,29 +75,13 @@ public class MinecraftServer implements Runnable {
          System.exit(0);
       }
 
-      if(!this.verifyNames) {
-         logger.warning("######################### WARNING #########################");
-         logger.warning("verify-names is set to false! This means that anyone who");
-         logger.warning("connects to this server can choose any username he or she");
-         logger.warning("wants! This includes impersonating an OP!");
-         if(this.public_) {
-            logger.warning("");
-            logger.warning("AND SINCE THIS IS A PUBLIC SERVER, IT WILL HAPPEN TO YOU!");
-            logger.warning("");
-         }
-
-         logger.warning("If you wish to fix this, edit server.properties, and change");
-         logger.warning("verify-names to true.");
-         logger.warning("###########################################################");
-      }
-
       try {
          this.properties.store(new FileWriter("server.properties"), "Minecraft server properties");
       } catch (Exception var2) {
          logger.warning("Failed to save server.properties!");
       }
 
-      this.networkManager = new NetworkManager[this.maxPlayers];
+      this.networkManager = new NetworkManager[32];
       this.bindTo = new BindTo(this);
       (new ConsoleInput(this)).start();
    }
@@ -210,15 +164,14 @@ public class MinecraftServer implements Runnable {
                      logger.severe("Failed to save the level! " + var11);
                   }
 
-                  logger.info("Level saved! Load: " + this.n.size() + "/" + this.maxPlayers);
+                  logger.info("Level saved! Load: " + this.n.size() + "/" + 32);
                }
 
                if(var7 % 900 == 0) {
                   HashMap var9;
                   (var9 = new HashMap()).put("name", this.serverName);
                   var9.put("users", Integer.valueOf(this.n.size()));
-                  var9.put("max", Integer.valueOf(this.maxPlayers - (this.adminSlot?1:0)));
-                  var9.put("public", Boolean.valueOf(this.public_));
+                  var9.put("max", Integer.valueOf(32 - (this.adminSlot?1:0)));
                   var9.put("salt", this.salt);
                   var9.put("admin-slot", Boolean.valueOf(this.adminSlot));
                   var9.put("version", Byte.valueOf((byte)7));
@@ -467,7 +420,7 @@ public class MinecraftServer implements Runnable {
    public final int a() {
       int var1 = 0;
 
-      for(int var2 = 0; var2 < this.maxPlayers; ++var2) {
+      for(int var2 = 0; var2 < 32; ++var2) {
          if(this.networkManager[var2] == null) {
             ++var1;
          }
@@ -477,7 +430,7 @@ public class MinecraftServer implements Runnable {
    }
 
    private int e() {
-      for(int var1 = 0; var1 < this.maxPlayers; ++var1) {
+      for(int var1 = 0; var1 < 32; ++var1) {
          if(this.networkManager[var1] == null) {
             return var1;
          }
